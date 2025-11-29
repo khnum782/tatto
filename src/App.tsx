@@ -14,7 +14,7 @@ function App() {
     html:
       '',
   }
-  const photoModules = import.meta.glob('./assets/photos/*.{png,jpg,jpeg,svg}', { eager: true }) as Record<string, any>
+  const photoModules = import.meta.glob('../img/*.{png,jpg,jpeg}', { eager: true }) as Record<string, any>
   const portfolioImages = Object.keys(photoModules)
     .sort()
     .map((k) => photoModules[k]?.default || photoModules[k])
@@ -22,6 +22,17 @@ function App() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState(0)
   const [sending, setSending] = useState(false)
+  const [clickedIndex, setClickedIndex] = useState<number | null>(null)
+  const formatDate = (d: Date) => {
+    const dd = String(d.getDate()).padStart(2, '0')
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const yyyy = d.getFullYear()
+    return `${dd}/${mm}/${yyyy}`
+  }
+  const imageDetails = portfolioImages.map((src, i) => ({
+    technique: ['Autoral', 'Fineline', 'Realismo'][i % 3],
+    date: formatDate(new Date()),
+  }))
   
   
   const openLightbox = (i: number) => {
@@ -55,6 +66,19 @@ function App() {
     els.forEach((el) => obs.observe(el))
     return () => obs.disconnect()
   }, [])
+
+  useEffect(() => {
+    const imgs = Array.from(document.querySelectorAll('.photo-reveal'))
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const el = entry.target as HTMLElement
+        if (entry.isIntersecting) el.classList.add('in-view')
+        else el.classList.remove('in-view')
+      })
+    }, { threshold: 0.12 })
+    imgs.forEach((el) => obs.observe(el))
+    return () => obs.disconnect()
+  }, [portfolioImages])
   
 
   const handleQuote = () => {
@@ -200,7 +224,14 @@ function App() {
           <h2>Portfólio</h2>
           <div className="masonry">
             {portfolioImages.map((src, i) => (
-              <img key={src} src={src} alt="Tatuagem" onClick={() => openLightbox(i)} />
+              <img
+                key={src}
+                className="photo-reveal"
+                style={{ ['--delay' as any]: `${i * 120}ms` }}
+                src={src}
+                alt="Tatuagem"
+                onClick={() => setClickedIndex(i)}
+              />
             ))}
           </div>
         </div>
@@ -283,13 +314,46 @@ function App() {
         <div className="lightbox" onClick={closeLightbox}>
           <div className="lightbox-inner" onClick={(e) => e.stopPropagation()}>
             <img src={portfolioImages[lightboxIndex]} alt="Tatuagem" />
+            <button className="control-btn close-btn" aria-label="Fechar" onClick={closeLightbox}>×</button>
             <div className="lightbox-controls">
               <button className="control-btn" aria-label="Anterior" onClick={prevImage}>‹</button>
-              <button className="control-btn" aria-label="Fechar" onClick={closeLightbox}>×</button>
               <button className="control-btn" aria-label="Próximo" onClick={nextImage}>›</button>
             </div>
           </div>
         </div>
+      )}
+      {clickedIndex !== null && (
+        <span className="photo-clicked" onClick={() => setClickedIndex(null)}>
+          <span className="photo-box" onClick={(e) => e.stopPropagation()}>
+            <div className="photo-image">
+              <img src={portfolioImages[clickedIndex]} alt="Tatuagem" />
+              <button
+                className="photo-arrow left"
+                aria-label="Anterior"
+                onClick={(e) => { e.stopPropagation(); setClickedIndex((idx) => idx === null ? 0 : (idx - 1 + portfolioImages.length) % portfolioImages.length) }}
+              >
+                ‹
+              </button>
+              <button
+                className="photo-arrow right"
+                aria-label="Próximo"
+                onClick={(e) => { e.stopPropagation(); setClickedIndex((idx) => idx === null ? 0 : (idx + 1) % portfolioImages.length) }}
+              >
+                ›
+              </button>
+            </div>
+            <div className="photo-info">
+              <h3>Detalhes</h3>
+              <p><strong>Arte:</strong> {imageDetails[clickedIndex].technique}</p>
+              <p><strong>Data:</strong> {imageDetails[clickedIndex].date}</p>
+              <p>Descrição breve da inspiração e técnica aplicada.</p>
+              <div className="photo-actions">
+                <button className="btn" onClick={() => setClickedIndex(null)}>Fechar</button>
+                <button className="btn primary" onClick={() => { setLightboxIndex(clickedIndex); setLightboxOpen(true); setClickedIndex(null) }}>Ver imagem</button>
+              </div>
+            </div>
+          </span>
+        </span>
       )}
       <footer className="footer">
         <div className="container footer-inner">
