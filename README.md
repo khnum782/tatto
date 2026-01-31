@@ -1,4 +1,16 @@
 # Tatto Studio — React + Vite
+<p align="center">
+
+<p align="center">
+  <a href="#-tecnologias">Tecnologias</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-projeto">Projeto</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#-layout">Layout</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#memo-licença">Licença</a>
+</p>
+
+<p align="center">
+  <img alt="License" src="./imagem/07.png">
+</p>
 
 Aplicação em React com Vite (rolldown-vite), estilizada em CSS, para página de portfólio, serviços e contato de estúdio de tatuagem.
 
