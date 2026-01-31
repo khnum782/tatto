@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img alt="License" src="./imagem/07.png">
+  <img alt="License" src="./img/07.png">
 </p>
 
 Aplicação em React com Vite (rolldown-vite), estilizada em CSS, para página de portfólio, serviços e contato de estúdio de tatuagem.
